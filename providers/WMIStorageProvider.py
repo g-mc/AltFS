@@ -89,15 +89,15 @@ class WMIStorageProvider(StorageProvider):
         self._buckets_names = [self._class_name]
         self._buckets_count = len(self._buckets_names)
         self._create_bucket()
-        logger.debug("namespace: %s" % self._namespace)
-        logger.debug("root class name: %s" % self._class_name)
+        logger.debug("namespace: %s", self._namespace)
+        logger.debug("root class name: %s", self._class_name)
 
     def _generate_bucket_name(self):
         classes = list([klass for klass in self._wmi_client.subclasses_of()
                         if not klass.startswith(
                             WMIStorageProvider.TARGET_CLASS_NAME_SUFFIX)])
         classes_count = len(classes)
-        logger.debug("found %s legitimate classes" % classes_count)
+        logger.debug("found %s legitimate classes", classes_count)
         machine_id_checksum = calculate_bits_sum(
             self._machine_id_string)
         target_class_id = machine_id_checksum % classes_count - len(
@@ -106,8 +106,8 @@ class WMIStorageProvider(StorageProvider):
                     self._wmi_client.subclasses_of())[
                     :machine_id_checksum % classes_count] if klass.startswith(
                     WMIStorageProvider.TARGET_CLASS_NAME_SUFFIX)])
-        logger.debug("target class for name generation: %s" %
-                     (classes[target_class_id]))
+        logger.debug("target class for name generation: %s",
+                     classes[target_class_id])
         return WMIStorageProvider.TARGET_CLASS_NAME_SUFFIX + \
             classes[target_class_id].split("_")[-1]
 
@@ -117,25 +117,25 @@ class WMIStorageProvider(StorageProvider):
             return
         p_ns = ctypes.c_wchar_p(self._namespace)
         p_cn = ctypes.c_wchar_p(self._class_name)
-        logger.debug("creating class: %s\\%s" %
-                     (self._namespace, self._class_name))
+        logger.debug("creating class: %s\\%s",
+                     self._namespace, self._class_name)
         self._wmi_client_dll.CreateClass(p_ns, p_cn)
 
     def write_block(self, bucket_id, value_id, data=""):
         """Described in parent class"""
-        logger.debug("writing block at (%s:%s)" % (bucket_id, value_id))
+        logger.debug("writing block at (%s:%s)", bucket_id, value_id)
         try:
             value_name = self._get_value_name(
                 bucket_id, value_id)
-            logger.debug("value with id already exists at (%s:%s)" %
-                         (bucket_id, value_id))
+            logger.debug("value with id already exists at (%s:%s)",
+                         bucket_id, value_id)
         except BucketValueMissingException:
             logger.debug(
                 "value with id does not exist in specified bucket." +
-                " generating a new value name for bucket id %s" % bucket_id)
+                " generating a new value name for bucket id %s", bucket_id)
             value_name = self._generate_value_name()
-            logger.debug("generated a new value name in bucket id %s: %s" % (
-                bucket_id, value_name))
+            logger.debug("generated a new value name in bucket id %s: %s",
+                         bucket_id, value_name)
         target_value_id = WMIStorageProvider.value_name_to_value_id(value_name)
         p_ns = ctypes.c_wchar_p(self._namespace)
         p_cn = ctypes.c_wchar_p(self._class_name)
@@ -153,7 +153,7 @@ class WMIStorageProvider(StorageProvider):
 
     def get_block(self, bucket_id, value_id):
         """Described in parent class"""
-        logger.debug("getting block at (%s:%s)" % (bucket_id, value_id))
+        logger.debug("getting block at (%s:%s)", bucket_id, value_id)
         data = self._wmi_client.get(self._class_name).wmi_property(
             self._get_value_name(bucket_id, value_id)).value
         return data
@@ -166,12 +166,12 @@ class WMIStorageProvider(StorageProvider):
         p_cn = ctypes.c_wchar_p(self._class_name)
         p_vn = ctypes.c_wchar_p(value_name)
         logger.debug(
-            "deleting a property at (%s:%s): %s\\%s.%s" %
-            (bucket_id,
-             WMIStorageProvider.value_name_to_value_id(value_name),
-             self._namespace,
-             self._class_name,
-             value_name))
+            "deleting a property at (%s:%s): %s\\%s.%s",
+            bucket_id,
+            WMIStorageProvider.value_name_to_value_id(value_name),
+            self._namespace,
+            self._class_name,
+            value_name)
         self._wmi_client_dll.DeleteProperty(p_ns, p_cn, p_vn)
 
     def get_value_ids_in_bucket(self, bucket_id):
@@ -190,16 +190,15 @@ class WMIStorageProvider(StorageProvider):
             WMIStorageProvider.PROPERTY_NAME_DELIMITER)[-1])
 
     def _get_value_name(self, bucket_id, value_id):
-        logger.debug("looking for value name at (%s:%s)" %
-                     (bucket_id, value_id))
+        logger.debug("looking for value name at (%s:%s)", bucket_id, value_id)
         if value_id is not None:
             values_dict = self._enumerate_applicable_values_dict()
-            logger.debug("existing values: %s" % values_dict)
+            logger.debug("existing values: %s", values_dict)
             if value_id in values_dict:
-                logger.debug("value name exists at (%s:%s): %s" %
-                             (bucket_id, value_id, values_dict[value_id]))
+                logger.debug("value name exists at (%s:%s): %s",
+                             bucket_id, value_id, values_dict[value_id])
                 return values_dict[value_id]
-        logger.debug("no value name at (%s:%s)" % (bucket_id, value_id))
+        logger.debug("no value name at (%s:%s)", bucket_id, value_id)
         raise BucketValueMissingException(
             "No applicable value found in bucket")
 

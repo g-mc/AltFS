@@ -70,33 +70,33 @@ class UserDefaultsStorageProvider(StorageProvider):
         # when calculating the bucket index
         self._buckets_names = [self._domain_name]
         self._buckets_count = len(self._buckets_names)
-        logger.debug("domain: %s" % self._domain_name)
+        logger.debug("domain: %s", self._domain_name)
 
     def write_block(self, bucket_id, value_id, data=""):
         """Described in parent class"""
-        logger.debug("writing block at (%s:%s)" % (bucket_id, value_id))
+        logger.debug("writing block at (%s:%s)", bucket_id, value_id)
         try:
             value_name = self._get_value_name(
                 bucket_id, value_id)
-            logger.debug("value with id already exists at (%s:%s)" %
-                         (bucket_id, value_id))
+            logger.debug("value with id already exists at (%s:%s)",
+                         bucket_id, value_id)
         except BucketValueMissingException:
             logger.debug(
                 "value with id does not exist in specified bucket." +
-                " generating a new value name for bucket id %s" % bucket_id)
+                " generating a new value name for bucket id %s", bucket_id)
             value_name = self._generate_value_name()
-            logger.debug("generated a new value name in bucket id %s: %s" % (
-                bucket_id, value_name))
+            logger.debug("generated a new value name in bucket id %s: %s",
+                         bucket_id, value_name)
         target_value_id = UserDefaultsStorageProvider.value_name_to_value_id(
             value_name)
-        logger.debug("creating a new key at (%s:%s): %s" % (
-            bucket_id, target_value_id, value_name))
+        logger.debug("creating a new key at (%s:%s): %s",
+                     bucket_id, target_value_id, value_name)
         self._defaults_client.write_key(value_name, data)
         return target_value_id
 
     def get_block(self, bucket_id, value_id):
         """Described in parent class"""
-        logger.debug("getting block at (%s:%s)" % (bucket_id, value_id))
+        logger.debug("getting block at (%s:%s)", bucket_id, value_id)
         data = self._defaults_client.get_key(
             self._get_value_name(bucket_id, value_id))
         return data
@@ -106,10 +106,10 @@ class UserDefaultsStorageProvider(StorageProvider):
         value_name = self._get_value_name(
             bucket_id, value_id)
         logger.debug(
-            "deleting a key at (%s:%s): %s" %
-            (bucket_id,
-             UserDefaultsStorageProvider.value_name_to_value_id(value_name),
-             value_name))
+            "deleting a key at (%s:%s): %s",
+            bucket_id,
+            UserDefaultsStorageProvider.value_name_to_value_id(value_name),
+            value_name)
         self._defaults_client.delete_key(value_name)
 
     def get_value_ids_in_bucket(self, bucket_id):
@@ -128,16 +128,15 @@ class UserDefaultsStorageProvider(StorageProvider):
             UserDefaultsStorageProvider.KEY_NAME_DELIMITER)[-1])
 
     def _get_value_name(self, bucket_id, value_id):
-        logger.debug("looking for value name at (%s:%s)" %
-                     (bucket_id, value_id))
+        logger.debug("looking for value name at (%s:%s)", bucket_id, value_id)
         if value_id is not None:
             values_dict = self._enumerate_applicable_values_dict()
-            logger.debug("existing values: %s" % values_dict)
+            logger.debug("existing values: %s", values_dict)
             if value_id in values_dict:
-                logger.debug("value name exists at (%s:%s): %s" %
-                             (bucket_id, value_id, values_dict[value_id]))
+                logger.debug("value name exists at (%s:%s): %s",
+                             bucket_id, value_id, values_dict[value_id])
                 return values_dict[value_id]
-        logger.debug("no value name at (%s:%s)" % (bucket_id, value_id))
+        logger.debug("no value name at (%s:%s)", bucket_id, value_id)
         raise BucketValueMissingException(
             "No applicable value found in bucket")
 

@@ -171,7 +171,7 @@ class AltFS(object):
           the global METHODS dictionary.
         """
         logger.debug("initializing AltFS with storage provider: %s, " +
-                     "machine identification method: %s" %
+                     "machine identification method: %s",
                      storage_provider_name, machine_identification_method)
         # calculate checksum of machine identification string, used for
         # calculating the bucket index of the first file system block
@@ -193,13 +193,13 @@ class AltFS(object):
         # set the max data block size
         self.max_block_size = max_block_size
         # log calculated initialization info
-        logger.info("INIT:number of buckets (=divider): %s" %
+        logger.info("INIT:number of buckets (=divider): %s",
                     self._buckets_count)
-        logger.info("INIT:machine identification string: %s" %
+        logger.info("INIT:machine identification string: %s",
                     machine_identification_string)
-        logger.info("INIT:machine identification checksum: %s" %
+        logger.info("INIT:machine identification checksum: %s",
                     self._machine_id_checksum)
-        logger.info("INIT:first bucket ID: %s" %
+        logger.info("INIT:first bucket ID: %s",
                     self._first_bucket_id)
         # iterate all buckets in storage to fill the blocks mapping
         self._load_blocks_dict()
@@ -305,12 +305,12 @@ class AltFS(object):
             block = Block.generate_block_from_packed_str(
                 self._storage_provider.get_block(bucket_id, value_id))
         except Exception as e:
-            logger.error("reading of block at (%s:%s) has failed: %s" %
-                         (bucket_id, value_id, str(e)))
+            logger.error("reading of block at (%s:%s) has failed: %s",
+                         bucket_id, value_id, str(e))
             raise InternalStorageOperationException(
                 InternalStorageOperationException.OPERATION_READ, str(e))
-        logger.debug("a block was read at (%s:%s):%s" %
-                     (bucket_id, value_id, block.__dict__))
+        logger.debug("a block was read at (%s:%s):%s",
+                     bucket_id, value_id, block.__dict__)
         return block
 
     def _get_block_by_id(self, block_id):
@@ -358,14 +358,14 @@ class AltFS(object):
 
         Raises InternalStorageOperationException if provider failed to write
         """
-        logger.debug("writing block at (%s:%s):%s" %
-                     (bucket_id, value_id, block.__dict__))
+        logger.debug("writing block at (%s:%s):%s",
+                     bucket_id, value_id, block.__dict__)
         try:
             value_id = self._storage_provider.write_block(
                 bucket_id, value_id, data=block.serialize())
         except Exception as e:
-            logger.error("writing of block (id:%s) to (%s:%s) has failed: %s" %
-                         (block.block_id, bucket_id, value_id, str(e)))
+            logger.error("writing of block (id:%s) to (%s:%s) has failed: %s",
+                         block.block_id, bucket_id, value_id, str(e))
             raise InternalStorageOperationException(
                 InternalStorageOperationException.OPERATION_WRITE, str(e))
         # add the new block mapping
@@ -393,14 +393,14 @@ class AltFS(object):
         Raises InternalStorageOperationException if provider failed to delete
         """
         block = self._get_block(bucket_id, value_id)
-        logger.debug("deleting block ID %s (%s:%s)" %
-                     (block.block_id, bucket_id, value_id))
+        logger.debug("deleting block ID %s (%s:%s)",
+                     block.block_id, bucket_id, value_id)
         try:
             self._storage_provider.delete_block(bucket_id, value_id)
         except Exception as e:
             logger.error(
-                "deleting of block (id:%s) to (%s:%s) has failed: %s" %
-                (block.block_id, bucket_id, value_id, str(e)))
+                "deleting of block (id:%s) to (%s:%s) has failed: %s",
+                block.block_id, bucket_id, value_id, str(e))
             raise InternalStorageOperationException(
                 InternalStorageOperationException.OPERATION_DELETE, str(e))
         # remove the mapping of the deleted block

@@ -94,8 +94,8 @@ class RegistryStorageProvider(StorageProvider):
                 "value with id does not exist in specified bucket." +
                 " generating a new value name for bucket id %s" % bucket_id)
             value_name = self._generate_value_name(bucket_id)
-            logger.debug("generated a new value name in bucket id %s: %s" % (
-                bucket_id, value_name))
+            logger.debug("generated a new value name in bucket id %s: %s",
+                         bucket_id, value_name)
         with self._get_bucket_key(bucket_id, _winreg.KEY_WRITE) as key:
             _winreg.SetValueEx(key, value_name, 0,
                                _winreg.REG_BINARY, data)
